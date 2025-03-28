@@ -1,0 +1,11 @@
+/vendor/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+*.log
+sql_queries/
+.ignore/
+newquery.txt
+runserver.bat
