@@ -1,4 +1,9 @@
 <?php
+namespace Seraph;
+
+use PDO;
+use PDOException;
+
 class DatabaseTable
 {
     /**

@@ -1,15 +1,28 @@
 <?php
 
-class QuoteController
+namespace App\Controllers;
+
+use Seraph\DatabaseTable;
+
+class Quote
 {
     public function __construct(private DatabaseTable $quotesTable, private DatabaseTable $authorsTable)
     {
     }
 
+    public function home()
+    {
+        $title = 'MyQuoteStoria';
+
+        return [
+            'template' => 'home.html.php',
+            'title' => $title,
+            'variables' => []
+        ];
+    }
+
     public function list()
     {
-        $title = 'Quote List';
-
         // Get quotes from database
         $result = $this->quotesTable->findAll();
 
@@ -27,64 +40,58 @@ class QuoteController
             ];
         }
 
+        $title = 'Quote List';
+
         // get total quotes
         $totalQuotes = $this->quotesTable->total();
 
-        // Output buffering for template
-        ob_start();
-        include __DIR__ . '/../templates/quotes.html.php';
-        $output = ob_get_clean();
-
-        return ['output' => $output, 'title' => $title];
+        return [
+            'template' => 'quotes.html.php',
+            'title' => $title,
+            'variables' => [
+                'totalQuotes' => $totalQuotes,
+                'quotes' => $quotes,
+            ]
+        ];
     }
 
-    public function home()
-    {
-        $title = 'MyQuoteStoria';
-
-
-        ob_start();
-        include __DIR__ . '/../templates/home.html.php';
-        $output = ob_get_clean();
-
-        return ['output' => $output, 'title' => $title];
-    }
 
     public function delete()
     {
         $this->quotesTable->delete(field: 'id', value: $_POST['id']);
-        header(header: 'location: index.php?action=list');
+        header(header: 'location: /joke/list');
     }
 
-    public function edit()
+    public function edit($id = null)
     {
 
         if (isset($_POST['quote'])) {
+
             $quote = $_POST['quote'];
             $quote['author_id'] = 1;
 
 
             $this->quotesTable->save(record: $quote);
 
-            header(header: 'location: index.php?action=list');
+            header(header: 'location: /joke/list');
 
         } else {
 
-            if (isset($_GET['id'])) {
-                $quote = find(pdo: $pdo, table: 'quotes', field: 'id', value: $_GET['id'])[0] ?? null;
+            if (isset($id)) {
+                $quote = $this->quotesTable->find(field: 'id', value: $id)[0];
             } else {
                 $quote = null;
             }
 
             $title = 'Edit Joke';
 
-            ob_start();
-
-            include __DIR__ . '/../templates/editquote.html.php';
-
-            $output = ob_get_clean();
-
-            return ['output' => $output, 'title' => $title];
+            return [
+                'template' => 'editquote.html.php',
+                'title' => $title,
+                'variables' => [
+                    'quote' => $quote,
+                ]
+            ];
         }
     }
 }
