@@ -56,42 +56,35 @@ class Quote
     }
 
 
-    public function delete()
+    public function deleteSubmit()
     {
         $this->quotesTable->delete(field: 'id', value: $_POST['id']);
-        header(header: 'location: /joke/list');
+        header(header: 'location: /quote/list');
+    }
+
+    public function editSubmit()
+    {
+        $quote = $_POST['quote'];
+        $quote['author_id'] = 1;
+        $this->quotesTable->save($quote);
+
+        header('location: /quote/list');
     }
 
     public function edit($id = null)
     {
-
-        if (isset($_POST['quote'])) {
-
-            $quote = $_POST['quote'];
-            $quote['author_id'] = 1;
-
-
-            $this->quotesTable->save(record: $quote);
-
-            header(header: 'location: /joke/list');
-
-        } else {
-
-            if (isset($id)) {
-                $quote = $this->quotesTable->find(field: 'id', value: $id)[0];
-            } else {
-                $quote = null;
-            }
-
-            $title = 'Edit Joke';
-
-            return [
-                'template' => 'editquote.html.php',
-                'title' => $title,
-                'variables' => [
-                    'quote' => $quote,
-                ]
-            ];
+        if (isset($id)) {
+            $quote = $this->quotesTable->find('id', $id)[0] ?? null;
         }
+
+        $title = 'Edit Quote';
+
+        return [
+            'template' => 'editquote.html.php',
+            'title' => $title,
+            'variables' => [
+                'quote' => $quote ?? null
+            ]
+        ];
     }
 }

@@ -12,6 +12,12 @@
         "symfony/var-dumper": "7.3.x-dev",
         "phan/phan": "v5.x-dev"
     },
+    "autoload": {
+        "psr-4": {
+            "Seraph\\": "Seraph",
+            "App\\": "App"
+        }
+    },
     "license": "AGPL-3.0-or-later",
     "authors": [
         {

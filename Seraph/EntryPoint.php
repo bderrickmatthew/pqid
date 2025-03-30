@@ -2,6 +2,7 @@
 
 namespace Seraph;
 
+use Seraph\Website;
 use PDOException;
 
 class EntryPoint
@@ -13,7 +14,7 @@ class EntryPoint
     {
     }
 
-    public function run($uri)
+    public function run(string $uri, string $method)
     {
         try {
             ///
@@ -24,20 +25,30 @@ class EntryPoint
             }
 
             $route = explode(separator: '/', string: $uri);
+
             $controllerName = array_shift(array: $route);
             $action = array_shift(array: $route);
 
+            if ($method === 'POST') {
+                $action .= 'Submit';
+            }
+
             $controller = $this->website->getController($controllerName);
 
-
             ///
-            $page = $controller->$action(...$route);
+            if (is_callable(value: [$controller, $action])) {
+                $page = $controller->$action(...$route);
 
-            $title = $page['title'];
+                $title = $page['title'];
 
-            $variables = $page['variables'] ?? [];
+                $variables = $page['variables'] ?? [];
 
-            $output = $this->loadTemplate(templateFileName: $page['template'], variables: $variables);
+                $output = $this->loadTemplate(templateFileName: $page['template'], variables: $variables);
+            } else {
+                http_response_code(404);
+                $title = 'Not found';
+                $output = 'Sorry, the page you are looking for could not be found.';
+            }
 
         } catch (PDOException $e) {
             $title = 'An error has occurred';

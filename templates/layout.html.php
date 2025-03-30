@@ -15,9 +15,9 @@
     <header>MyQuoteStoria</header>
     <nav>
         <ul>
-            <li><a href="/index.php">Home</a></li>
-            <li><a href="/index.php?action=list">Quotes List</a></li>
-            <li><a href="/index.php?action=edit">Add a new Quote</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/quotes/list">Quotes List</a></li>
+            <li><a href="/quotes/edit">Add a new Quote</a></li>
         </ul>
     </nav>
 
