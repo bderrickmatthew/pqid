@@ -1,17 +1,20 @@
 <?php
 try {
     include __DIR__ . '/../includes/DatabaseConnection.php';
-    include __DIR__ . '/../includes/DatabaseFunctions.php';
+    include __DIR__ . '/../classes/DatabaseTable.php';
+    include __DIR__ . '/../controllers/QuoteController.php';
 
-    $title = 'Home';
+    $quotesTable = new DatabaseTable(pdo: $pdo, table: 'quotes', primaryKey: 'id');
+    $authorsTable = new DatabaseTable(pdo: $pdo, table: 'authors', primaryKey: 'id');
 
-    // Get total number of quotes
-    $totalQuotes = totalQuotes($pdo);
+    $quoteController = new QuoteController(quotesTable: $quotesTable, authorsTable: $authorsTable);
 
-    // Fix template path by going up one level from public
-    ob_start();
-    include __DIR__ . '/../templates/home.html.php';
-    $output = ob_get_clean();
+    $action = $_GET['action'] ?? 'home';
+
+    $page = $quoteController->$action();
+
+    $title = $page['title'];
+    $output = $page['output'];
 
 } catch (PDOException $e) {
     $title = 'An error has occurred';

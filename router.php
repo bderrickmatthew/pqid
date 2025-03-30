@@ -1,39 +1,49 @@
 <?php
-// Serve static files directly
-if (preg_match('/\.(?:css|js|jpg|jpeg|png|gif)$/', $_SERVER["REQUEST_URI"])) {
-    $file = __DIR__ . '/public' . $_SERVER["REQUEST_URI"];
-    if (file_exists($file)) {
-        // Set correct content type header
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-        switch ($extension) {
-            case 'css':
-                header('Content-Type: text/css');
-                break;
-            case 'js':
-                header('Content-Type: application/javascript');
-                break;
-            // Add other content types as needed
-        }
-        readfile($file);
-        return true;
+
+$requestUri = $_SERVER['REQUEST_URI'];
+
+// Static file serving
+if (preg_match(pattern: '/\.(css|js|jpg|jpeg|png|gif)$/', subject: $requestUri)) {
+    $filePath = __DIR__ . '/public' . $requestUri;
+
+    if (file_exists(filename: $filePath) && is_readable(filename: $filePath)) {
+        $fileExtension = pathinfo(path: $filePath, flags: PATHINFO_EXTENSION);
+        $mimeTypes = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+        ];
+
+        header(header: 'Content-Type: ' . ($mimeTypes[$fileExtension] ?? 'application/octet-stream'));
+        readfile(filename: $filePath);
+        exit; // Stop further processing
+    } else {
+        http_response_code(response_code: 404);
+        echo '404 File Not Found';
+        exit;
     }
-    return false;
 }
 
-// Remove /public/ from the URI if present
-$uri = str_replace('/public/', '/', $_SERVER['REQUEST_URI']);
+// Application routing
+$uri = parse_url(url: $requestUri, component: PHP_URL_PATH);
+$uri = ltrim(string: str_replace(search: '/public/', replace: '/', subject: $uri), characters: '/');
 
-// Set the base path for includes
-chdir(__DIR__ . '/public');
+$allowedFiles = [
+    'index.php',
+    'quotes.php',
+    'editquote.php',
+    'deletequote.php',
+    'addquote.php'
+    // Add other allowed files
+];
 
-// Include the requested file
-$file = 'index.php';
-if ($uri !== '/') {
-    $file = ltrim($uri, '/');
-}
-
-if (file_exists($file)) {
-    require $file;
+if (in_array(needle: $uri, haystack: $allowedFiles) && file_exists(filename: __DIR__ . '/public/' . $uri)) {
+    chdir(directory: __DIR__ . '/public');
+    require $uri;
 } else {
-    require 'index.php';
+    chdir(directory: __DIR__ . '/public');
+    require 'index.php'; // Default fallback
 }
