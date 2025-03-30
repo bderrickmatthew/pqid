@@ -16,8 +16,8 @@
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/quotes/list">Quotes List</a></li>
-            <li><a href="/quotes/edit">Add a new Quote</a></li>
+            <li><a href="/quote/list">Quotes List</a></li>
+            <li><a href="/quote/edit">Add a new Quote</a></li>
         </ul>
     </nav>
 

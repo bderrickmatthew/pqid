@@ -2,7 +2,6 @@
 
 namespace Seraph;
 
-use Seraph\Website;
 use PDOException;
 
 class EntryPoint
